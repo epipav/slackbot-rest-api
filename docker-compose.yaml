@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+    v-bot-api:
+        build:  
+            context: ./
+            dockerfile: Dockerfile
+        command: npm start
+        image: anilbostanci/rest-api:h-0.1.16
+        depends_on:
+            - "db"
+        ports:
+            - "3001:3001"
+        working_dir: /usr/api
+        #volumes:
+        #    - '~/Documents/anilbostanci-restful-api-express-mongoose:/usr/api'
+        networks:
+            - slackbot-net
+        environment: 
+            - DATABASE_URL=mongodb://db:27017/rest-api
+
+    db:
+        image: mongo
+        volumes:
+            - slackbot-db:/data/db
+            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+        ports:
+            - "27020:27017"
+        restart: always
+        networks:
+            - slackbot-net
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=root
+            - MONGO_INITDB_DATABASE=rest-api
+
+volumes:
+    slackbot-db:
+networks:
+    slackbot-net:
